@@ -1,3 +1,8 @@
+#ifndef __queue_h__
+#define __queue_h__
+
+#include <stdio.h>
+#include <stdlib.h>
 /**
  * This module contains the queue stuct and
  * the functions for acting on the queue
@@ -6,7 +11,8 @@
 // The Queue struct contains basic info about the Queue
 typedef struct {
     char ** head;
-    char ** tail;
+    int queue_size;
+    int num_elem;
     // TODO sem mutex -- or some other lock
     int enqueueCount;
     int dequeueCount;
@@ -39,3 +45,5 @@ char * DequeueString(Queue *q);
  * This function prints the statistics for this queue
  */
 void PrintQueueStats(Queue *q);
+
+#endif
