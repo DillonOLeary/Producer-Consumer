@@ -15,7 +15,6 @@ typedef struct {
     char ** head;
     int queue_size;
     int num_elem;
-    // TODO sem mutex -- or some other lock
     pthread_mutex_t mutex;
     pthread_cond_t q_filling;
     pthread_cond_t q_emptying;
@@ -50,10 +49,5 @@ char * DequeueString(Queue *q);
  * This function prints the statistics for this queue
  */
 void PrintQueueStats(Queue *q);
-
-/**
- * Close the variables in the queue
- */
-void CloseQueue(Queue *q);
 
 #endif

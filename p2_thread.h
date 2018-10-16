@@ -60,10 +60,4 @@ int Munch2Action(P2_thread *t);
  */
 int WriterAction(P2_thread *t);
 
-/**
- * Close the thread; deallocate memory and
- * close the queue
- */
-int CloseThread(P2_thread *t);
-
 #endif

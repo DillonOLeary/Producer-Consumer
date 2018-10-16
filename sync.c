@@ -1,9 +1,9 @@
 #define NUM_THREADS 4
+#include "P2_thread.h"
 
 void * run_thread(P2_thread *t) {
     // FIXME i don't know if this is the correct way to call these functions
-    (t->DoAction)(t);
-    CloseThread(t);
+    while (DONE != (t->DoAction)(t));
     return NULL;
 }
 
