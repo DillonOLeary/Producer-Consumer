@@ -35,12 +35,9 @@ void EnqueueString(Queue *q, char *string) {
         printf("Error occured locking mutex\n");
         exit(-1);
     }
-    int  i;
-    printf("enqueue num_elem: %d, queue_size: %d\n", q->num_elem, q->queue_size);
     // while the queue is full then increment blocked count and  wait
     while (q->num_elem >= q->queue_size) {
         q->enqueueBlockCount = q->enqueueBlockCount + 1;
-        printf("    enqueueBlockCount: %d\n", q->enqueueBlockCount); 
         if (0 != pthread_cond_wait(&(q->q_filling),&(q->mutex))) {
             printf("Error occured waiting\n");
             exit(-1);
@@ -68,7 +65,6 @@ char * DequeueString(Queue *q) {
         exit(-1);
     }
     char* ret_str;
-    printf("        dequeue num_elem: %d, queue_size: %d\n", q->num_elem, q->queue_size);
     // while the queue is full then increment blocked count and  wait
     while (q->num_elem <= 0) {
         q->dequeueBlockCount = q->dequeueBlockCount + 1;
@@ -91,7 +87,7 @@ char * DequeueString(Queue *q) {
         printf("Error occured unlocking mutex\n");
         exit(-1);
     }
-    return NULL;
+    return ret_str;
 }
 
 void PrintQueueStats(Queue *q) {
