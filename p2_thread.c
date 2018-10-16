@@ -7,6 +7,10 @@
 #define TO_UPPER_CASE(c) (c - 32)
 
 
+P2_thread ** CreateThreadWrapper() {
+    return NULL;    
+}
+
 int ReaderAction(P2_thread *t) {
    
     char input[IN_BUFF_SIZE];

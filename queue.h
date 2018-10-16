@@ -51,4 +51,9 @@ char * DequeueString(Queue *q);
  */
 void PrintQueueStats(Queue *q);
 
+/**
+ * Close the variables in the queue
+ */
+void CloseQueue(Queue *q);
+
 #endif
