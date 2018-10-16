@@ -1,5 +1,6 @@
 #ifndef __P2__thread_H__
 #define __P2__thread_H__
+#include "queue.h"
 
 /**
  * This module contains the p2_thread struct,
