@@ -38,11 +38,14 @@ typedef struct {
  * function which defines the behavior of the
  * thread.
  */
-P2_thread * CreateThreadStruct(int (*DoAction)());
+P2_thread * CreateThreadStruct(int (*DoAction)(), Queue *this_q, Queue *next_q;);
 
 /**
  * Creates the wrapper containing all the thread 
- * info stucts
+ * info stucts.
+ *
+ * This will create the three queues that are shared
+ * by the threads
  */
 P2_threads_wrapper * CreateThreadWrapper();
 

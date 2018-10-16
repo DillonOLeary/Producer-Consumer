@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
+#include <sys/types.h>
 /**
  * This module contains the queue stuct and
  * the functions for acting on the queue
@@ -14,6 +16,9 @@ typedef struct {
     int queue_size;
     int num_elem;
     // TODO sem mutex -- or some other lock
+    pthread_mutex_t mutex;
+    pthread_cond_t q_full;
+    pthread_cond_t q_empty;
     int enqueueCount;
     int dequeueCount;
     int enqueueBlockCount;

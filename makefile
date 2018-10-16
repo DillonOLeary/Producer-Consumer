@@ -4,7 +4,7 @@ EXE = test_queue
 SCAN_BUILD_DIR = scan-build-out
 
 test_queue: test_queue.o queue.o 
-	$(CC) -o $(EXE) test_queue.o queue.o
+	$(CC) -pthread -o $(EXE) test_queue.o queue.o
 
 test_queue.o: test_queue.c
 	$(CC) $(WARNING_FLAGS) -c test_queue.c
