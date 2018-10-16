@@ -2,8 +2,8 @@
 #include "queue.h"
 #include <unistd.h>
 #include <pthread.h>
-
-pthread_t tid[2];
+#define NUM_THREADS 12
+pthread_t tid[NUM_THREADS];
 
 void * test_thread(void *q) {
     q = (Queue*)q;
@@ -17,14 +17,17 @@ int main() {
     i = 0;
     Queue *q;
     q = CreateStringQueue(10);
-    while(i < 2)
+    while(i < NUM_THREADS)
     {
         q = (void*)q;
         pthread_create(&(tid[i]), NULL, &test_thread, q);
         i++;
     }
-    pthread_join(tid[0], NULL);
-    pthread_join(tid[1], NULL);
+    i = 0;
+    while (i < NUM_THREADS) {
+        pthread_join(tid[i], NULL);
+        i++;
+    }
     pthread_mutex_destroy(&(q->mutex));
     return 0;
 }

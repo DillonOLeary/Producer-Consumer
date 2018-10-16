@@ -15,7 +15,7 @@ Queue *CreateStringQueue(int size) {
         printf("Error initializing mutex\n");
         exit(-1);
     }
-    if (0 != pthread_cond_init(&(q->q_fulling), NULL) ) {
+    if (0 != pthread_cond_init(&(q->q_filling), NULL) ) {
         printf("Error initializing condition var filling\n");
         exit(-1);
     }
@@ -36,16 +36,24 @@ void EnqueueString(Queue *q, char *string) {
         exit(-1);
     }
     int  i;
-    printf("%s\n",string);
-    for(i=0; i<(0xFFFFFFFF);i++);
-    printf("End Loop\n");
+    printf("num_elem: %d, queue_size: %d\n", q->num_elem, q->queue_size);
     // while the queue is full then increment blocked count and  wait
-    if (q->num_elem == q->queue_size) {
-
+    while (q->num_elem >= q->queue_size) {
+        q->enqueueBlockCount = q->enqueueBlockCount + 1;
+        if (0 != pthread_cond_wait(&(q->q_filling),&(q->mutex))) {
+            printf("Error occured waiting\n");
+            exit(-1);
+        }
     }
     // add string to queue at num_elem
     // increment num_elem
+    q->head[q->num_elem++] = string;
+    q->enqueueCount++;
     // notify dequeue
+    if (0 != pthread_cond_signal(&(q->q_emptying))) {
+        printf("Error occured signaling condition var\n");
+        exit(-1);
+    }
     // unlock monitor
     if (0 != pthread_mutex_unlock(&(q->mutex))) {
         printf("Error occured unlocking mutex\n");
