@@ -36,7 +36,7 @@ int Munch1Action(P2_thread *t) {
     for (i = 0; i < IN_BUFF_SIZE; i++) {
         if (string[i] == '\n' || string[i] == EOF) {
             EnqueueString(t->next_q, string);
-            if (input[i] == EOF) return DONE;
+            if (string[i] == EOF) return DONE;
             else return NOT_DONE;
         }
         if (string[i] == ' ') string[i] = '*';
@@ -51,7 +51,7 @@ int Munch2Action(P2_thread *t) {
     for (i = 0; i < IN_BUFF_SIZE; i++) {
         if (string[i] == '\n' || string[i] == EOF) {
             EnqueueString(t->next_q, string);
-            if (input[i] == EOF) return DONE;
+            if (string[i] == EOF) return DONE;
             else return NOT_DONE;
 
         }
@@ -68,11 +68,12 @@ int WriterAction(P2_thread *t) {
     for (i = 0; i < IN_BUFF_SIZE; i++) {
         if (string[i] == '\n' || string[i] == EOF) {
             printf("%s", string);
-            if (input[i] == EOF) return DONE;
+            if (string[i] == EOF) return DONE;
             else {
                 free(string);
                 return NOT_DONE;
             }
         }   
     }
+    return NOT_DONE;
 }
