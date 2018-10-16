@@ -7,7 +7,6 @@
 Queue *CreateStringQueue(int size) {
     Queue *q;
     q = malloc(sizeof(Queue));
-    // TODO remember to free the queue
     q->queue_size = size;
     q->num_elem = 0;
     q->head = malloc(q->queue_size * sizeof(char*));
@@ -23,7 +22,6 @@ Queue *CreateStringQueue(int size) {
         printf("Error initializing condition var emptying\n");
         exit(-1);
     }
-    // TODO remember to free the allocation
     q->enqueueCount = q->dequeueCount = 0;
     q->enqueueBlockCount = q->dequeueBlockCount = 0;
     return q;
