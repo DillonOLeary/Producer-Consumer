@@ -15,7 +15,6 @@
 // thread that will run
 typedef struct {
     int (*DoAction)();
-    int (*close)();
     Queue *this_q;
     Queue *next_q;
     // This is used by the first thread to take input
@@ -40,8 +39,6 @@ P2_thread ** CreateThreadArray();
  */
 int ReaderAction(P2_thread *t);
 
-int ReaderClose(P2_thread *t);
-
 /**
  * Munch1 will scan the line and replace each space
  * character (not tabs or newlines) with an asterisk
@@ -49,8 +46,6 @@ int ReaderClose(P2_thread *t);
  * thread Munch2 through another queue of character strings.
  */
 int Munch1Action(P2_thread *t);
-
-int Munch1Close(P2_thread *t);
 
 /**
  * Munch2 will scan the line and convert all lower case 
@@ -60,13 +55,15 @@ int Munch1Close(P2_thread *t);
  */
 int Munch2Action(P2_thread *t);
 
-int Munch2Close(P2_thread *t);
-
 /**
  * Writer will write the line to standard output.
  */
 int WriterAction(P2_thread *t);
 
-int WriterClose(P2_thread *t);
+/**
+ * Close the thread; deallocate memory and
+ * close the queue
+ */
+int CloseThread(P2_thread *t);
 
 #endif

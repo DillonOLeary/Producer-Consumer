@@ -3,7 +3,7 @@
 void * run_thread(P2_thread *t) {
     // FIXME i don't know if this is the correct way to call these functions
     (t->DoAction)(t);
-    (t->close)(t);
+    CloseThread(t);
     return NULL;
 }
 
