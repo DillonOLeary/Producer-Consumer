@@ -2,12 +2,22 @@
 #include "queue.h"
 #include <unistd.h>
 #include <pthread.h>
-
-pthread_t tid[2];
+#define NUM_THREADS 30
+pthread_t tid[NUM_THREADS];
 
 void * test_thread(void *q) {
     q = (Queue*)q;
-    EnqueueString(q, "TEST");
+    int i;
+    for (i = 0; i < 300000; i++)
+        EnqueueString(q, "TEST");
+    return NULL;
+}
+
+void * test_thread1(void *q) {
+    q = (Queue*)q;
+    int i;
+    for (i = 0; i < 300000; i++)
+        DequeueString(q);
     return NULL;
 }
 
@@ -17,14 +27,22 @@ int main() {
     i = 0;
     Queue *q;
     q = CreateStringQueue(10);
-    while(i < 2)
+    while(i < NUM_THREADS)
     {
         q = (void*)q;
-        pthread_create(&(tid[i]), NULL, &test_thread, q);
+        if (i < NUM_THREADS / 2) {
+            pthread_create(&(tid[i]), NULL, &test_thread1, q);
+        } else {
+            pthread_create(&(tid[i]), NULL, &test_thread, q);
+        }
         i++;
     }
-    pthread_join(tid[0], NULL);
-    pthread_join(tid[1], NULL);
+    i = 0;
+    while (i < NUM_THREADS) {
+        pthread_join(tid[i], NULL);
+        i++;
+    }
     pthread_mutex_destroy(&(q->mutex));
+    PrintQueueStats(q);
     return 0;
 }

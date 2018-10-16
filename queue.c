@@ -15,7 +15,7 @@ Queue *CreateStringQueue(int size) {
         printf("Error initializing mutex\n");
         exit(-1);
     }
-    if (0 != pthread_cond_init(&(q->q_fulling), NULL) ) {
+    if (0 != pthread_cond_init(&(q->q_filling), NULL) ) {
         printf("Error initializing condition var filling\n");
         exit(-1);
     }
@@ -35,32 +35,28 @@ void EnqueueString(Queue *q, char *string) {
         printf("Error occured locking mutex\n");
         exit(-1);
     }
-    int  i;
-    printf("%s\n",string);
-    for(i=0; i<(0xFFFFFFFF);i++);
-    printf("End Loop\n");
     // while the queue is full then increment blocked count and  wait
-    if (q->num_elem == q->queue_size) {
-
+    while (q->num_elem >= q->queue_size) {
+        q->enqueueBlockCount = q->enqueueBlockCount + 1;
+        if (0 != pthread_cond_wait(&(q->q_filling),&(q->mutex))) {
+            printf("Error occured waiting\n");
+            exit(-1);
+        }
     }
     // add string to queue at num_elem
     // increment num_elem
+    q->head[q->num_elem++] = string;
+    q->enqueueCount++;
     // notify dequeue
+    if (0 != pthread_cond_signal(&(q->q_emptying))) {
+        printf("Error occured signaling condition var\n");
+        exit(-1);
+    }
     // unlock monitor
     if (0 != pthread_mutex_unlock(&(q->mutex))) {
         printf("Error occured unlocking mutex\n");
         exit(-1);
     }
-
-    //
-    // or
-    //
-    // sem_P(queue_add)
-    // sem_P(mutex)
-    // add string to queue at num_elem
-    // increment num_elem
-    // sem_V(mutex)
-    // sem_V(queue_remove)
 }
 
 char * DequeueString(Queue *q) {
@@ -68,20 +64,35 @@ char * DequeueString(Queue *q) {
         printf("Error occured locking mutex\n");
         exit(-1);
     }
+    char* ret_str;
+    // while the queue is full then increment blocked count and  wait
+    while (q->num_elem <= 0) {
+        q->dequeueBlockCount = q->dequeueBlockCount + 1;
+        if (0 != pthread_cond_wait(&(q->q_emptying),&(q->mutex))) {
+            printf("Error occured waiting\n");
+            exit(-1);
+        }
+    }
+    // add string to queue at num_elem
+    // increment num_elem
+    ret_str = q->head[--(q->num_elem)];
+    q->dequeueCount++;
+    // notify dequeue
+    if (0 != pthread_cond_signal(&(q->q_filling))) {
+        printf("Error occured signaling condition var\n");
+        exit(-1);
+    }
 
-    // sem_P(queue_remove)
-    // sem_P(mutex)
-    // remove string from queue at index 0
-    // deccrement num_elem
-    // sem_V(mutex)
-    // sem_V(queue_add)
     if (0 != pthread_mutex_unlock(&(q->mutex))) {
         printf("Error occured unlocking mutex\n");
         exit(-1);
     }
-    return NULL;
+    return ret_str;
 }
 
 void PrintQueueStats(Queue *q) {
-
+    fprintf(stderr, "enqueueCount: %d, dequeueCount: %d, "
+            "enqueueBlockCount: %d, dequeueBlockCount: %d\n",
+            q->enqueueCount, q->dequeueCount, 
+            q->enqueueBlockCount, q->dequeueBlockCount);
 }
