@@ -1,4 +1,4 @@
-#include "p2_threads.h"
+#include "p2_thread.h"
 #include <stdio.h>
 #include <stdbool.h>
 
