@@ -12,6 +12,7 @@ void * test_thread(void *q) {
 }
 
 int main() {
+    // FIXME why did this not work when I used fork()??
     int i;
     i = 0;
     Queue *q;
@@ -24,5 +25,6 @@ int main() {
     }
     pthread_join(tid[0], NULL);
     pthread_join(tid[1], NULL);
+    pthread_mutex_destroy(&(q->mutex));
     return 0;
 }

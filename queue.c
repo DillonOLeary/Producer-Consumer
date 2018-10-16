@@ -15,6 +15,14 @@ Queue *CreateStringQueue(int size) {
         printf("Error initializing mutex\n");
         exit(-1);
     }
+    if (0 != pthread_cond_init(&(q->q_fulling), NULL) ) {
+        printf("Error initializing condition var filling\n");
+        exit(-1);
+    }
+    if (0 != pthread_cond_init(&(q->q_emptying), NULL) ) {
+        printf("Error initializing condition var emptying\n");
+        exit(-1);
+    }
     // TODO remember to free the allocation
     q->enqueueCount = q->dequeueCount = 0;
     q->enqueueBlockCount = q->dequeueBlockCount = 0;
@@ -22,6 +30,7 @@ Queue *CreateStringQueue(int size) {
 }
 
 void EnqueueString(Queue *q, char *string) {
+    // lock with monitor
     if (0 != pthread_mutex_lock(&(q->mutex))) {
         printf("Error occured locking mutex\n");
         exit(-1);
@@ -29,22 +38,19 @@ void EnqueueString(Queue *q, char *string) {
     int  i;
     printf("%s\n",string);
     for(i=0; i<(0xFFFFFFFF);i++);
-    printf("Type in a number \n");
-    //scanf("%d", &number);
-    printf("1\n");
-    printf("2\n");
-    printf("3\n");
-    printf("4\n");
-    printf("5\n");
-    printf("6\n");
-    // lock with monitor
+    printf("End Loop\n");
     // while the queue is full then increment blocked count and  wait
+    if (q->num_elem == q->queue_size) {
+
+    }
     // add string to queue at num_elem
     // increment num_elem
     // notify dequeue
     // unlock monitor
-    pthread_mutex_unlock(&(q->mutex));
-
+    if (0 != pthread_mutex_unlock(&(q->mutex))) {
+        printf("Error occured unlocking mutex\n");
+        exit(-1);
+    }
 
     //
     // or
@@ -58,12 +64,21 @@ void EnqueueString(Queue *q, char *string) {
 }
 
 char * DequeueString(Queue *q) {
+    if (0 != pthread_mutex_lock(&(q->mutex))) {
+        printf("Error occured locking mutex\n");
+        exit(-1);
+    }
+
     // sem_P(queue_remove)
     // sem_P(mutex)
     // remove string from queue at index 0
     // deccrement num_elem
     // sem_V(mutex)
     // sem_V(queue_add)
+    if (0 != pthread_mutex_unlock(&(q->mutex))) {
+        printf("Error occured unlocking mutex\n");
+        exit(-1);
+    }
     return NULL;
 }
 
