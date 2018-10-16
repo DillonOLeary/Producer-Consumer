@@ -36,10 +36,11 @@ void EnqueueString(Queue *q, char *string) {
         exit(-1);
     }
     int  i;
-    printf("num_elem: %d, queue_size: %d\n", q->num_elem, q->queue_size);
+    printf("enqueue num_elem: %d, queue_size: %d\n", q->num_elem, q->queue_size);
     // while the queue is full then increment blocked count and  wait
     while (q->num_elem >= q->queue_size) {
         q->enqueueBlockCount = q->enqueueBlockCount + 1;
+        printf("    enqueueBlockCount: %d\n", q->enqueueBlockCount); 
         if (0 != pthread_cond_wait(&(q->q_filling),&(q->mutex))) {
             printf("Error occured waiting\n");
             exit(-1);
@@ -59,16 +60,6 @@ void EnqueueString(Queue *q, char *string) {
         printf("Error occured unlocking mutex\n");
         exit(-1);
     }
-
-    //
-    // or
-    //
-    // sem_P(queue_add)
-    // sem_P(mutex)
-    // add string to queue at num_elem
-    // increment num_elem
-    // sem_V(mutex)
-    // sem_V(queue_remove)
 }
 
 char * DequeueString(Queue *q) {
@@ -76,13 +67,26 @@ char * DequeueString(Queue *q) {
         printf("Error occured locking mutex\n");
         exit(-1);
     }
+    char* ret_str;
+    printf("        dequeue num_elem: %d, queue_size: %d\n", q->num_elem, q->queue_size);
+    // while the queue is full then increment blocked count and  wait
+    while (q->num_elem <= 0) {
+        q->dequeueBlockCount = q->dequeueBlockCount + 1;
+        if (0 != pthread_cond_wait(&(q->q_emptying),&(q->mutex))) {
+            printf("Error occured waiting\n");
+            exit(-1);
+        }
+    }
+    // add string to queue at num_elem
+    // increment num_elem
+    ret_str = q->head[--(q->num_elem)];
+    q->dequeueCount++;
+    // notify dequeue
+    if (0 != pthread_cond_signal(&(q->q_filling))) {
+        printf("Error occured signaling condition var\n");
+        exit(-1);
+    }
 
-    // sem_P(queue_remove)
-    // sem_P(mutex)
-    // remove string from queue at index 0
-    // deccrement num_elem
-    // sem_V(mutex)
-    // sem_V(queue_add)
     if (0 != pthread_mutex_unlock(&(q->mutex))) {
         printf("Error occured unlocking mutex\n");
         exit(-1);
@@ -91,5 +95,8 @@ char * DequeueString(Queue *q) {
 }
 
 void PrintQueueStats(Queue *q) {
-
+    fprintf(stderr, "enqueueCount: %d, dequeueCount: %d, "
+            "enqueueBlockCount: %d, dequeueBlockCount: %d\n",
+            q->enqueueCount, q->dequeueCount, 
+            q->enqueueBlockCount, q->dequeueBlockCount);
 }
