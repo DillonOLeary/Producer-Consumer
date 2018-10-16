@@ -1,3 +1,6 @@
+#ifndef __P2__thread_H__
+#define __P2__thread_H__
+
 /**
  * This module contains the p2_thread struct,
  * the p2_threads_wrapper struct,
@@ -20,34 +23,13 @@ typedef struct {
 } P2_thread;
 
 /**
- * this function contains all the different
- * threads' info that will run
- */
-typedef struct {
-    P2_thread *reader;
-    P2_thread *munch1;
-    P2_thread *munch2;
-    P2_thread *writer;
-} P2_threads_wrapper;
-
-/**
- * Initialize a thread with the function that
- * defines its behavior.
- *
- * The caller must mass in the pointer to the
- * function which defines the behavior of the
- * thread.
- */
-P2_thread * CreateThreadStruct(int (*DoAction)(), Queue *this_q, Queue *next_q;);
-
-/**
- * Creates the wrapper containing all the thread 
+ * Creates an array containing all the thread 
  * info stucts.
  *
  * This will create the three queues that are shared
  * by the threads
  */
-P2_threads_wrapper * CreateThreadWrapper();
+P2_thread ** CreateThreadArray();
 
 /**
  * The Reader thread will read from standard input, 
@@ -77,3 +59,5 @@ int Munch2Action(P2_thread *t);
  * Writer will write the line to standard output.
  */
 int WriterAction(P2_thread *t);
+
+#endif

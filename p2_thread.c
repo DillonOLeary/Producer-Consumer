@@ -7,6 +7,10 @@
 
 const int IN_BUFF_SIZE = 1024;
 
+P2_thread ** CreateThreadWrapper() {
+    return NULL;    
+}
+
 int ReaderAction(P2_thread *t) {
    
     char *input = malloc(sizeof(char) * IN_BUFF_SIZE);
