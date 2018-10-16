@@ -1,9 +1,9 @@
 #include "p2_threads.h"
+#include <stdio.h>
 #include <stdbool.h>
 
 #define a_ASCII      97
 #define z_ASCII      122
-#define TO_UPPER_CASE(c) (c - 32)
 
 const int IN_BUFF_SIZE = 1024;
 
