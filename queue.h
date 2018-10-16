@@ -17,7 +17,7 @@ typedef struct {
     int num_elem;
     // TODO sem mutex -- or some other lock
     pthread_mutex_t mutex;
-    pthread_cond_t q_fulling;
+    pthread_cond_t q_filling;
     pthread_cond_t q_emptying;
     int enqueueCount;
     int dequeueCount;
