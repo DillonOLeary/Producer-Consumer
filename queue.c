@@ -11,15 +11,15 @@ Queue *CreateStringQueue(int size) {
     q->num_elem = 0;
     q->head = malloc(q->queue_size * sizeof(char*));
     if (0 != pthread_mutex_init(&(q->mutex), NULL) ) {
-        printf("Error initializing mutex\n");
+        fprintf(stderr, "Error initializing mutex\n");
         exit(-1);
     }
     if (0 != pthread_cond_init(&(q->q_filling), NULL) ) {
-        printf("Error initializing condition var filling\n");
+        fprintf(stderr, "Error initializing condition var filling\n");
         exit(-1);
     }
     if (0 != pthread_cond_init(&(q->q_emptying), NULL) ) {
-        printf("Error initializing condition var emptying\n");
+        fprintf(stderr, "Error initializing condition var emptying\n");
         exit(-1);
     }
     q->enqueueCount = q->dequeueCount = 0;
@@ -30,14 +30,14 @@ Queue *CreateStringQueue(int size) {
 void EnqueueString(Queue *q, char *string) {
     // lock with monitor
     if (0 != pthread_mutex_lock(&(q->mutex))) {
-        printf("Error occured locking mutex\n");
+        fprintf(stderr, "Error occured locking mutex\n");
         exit(-1);
     }
     // while the queue is full then increment blocked count and  wait
     while (q->num_elem >= q->queue_size) {
         q->enqueueBlockCount = q->enqueueBlockCount + 1;
         if (0 != pthread_cond_wait(&(q->q_filling),&(q->mutex))) {
-            printf("Error occured waiting\n");
+            fprintf(stderr, "Error occured waiting\n");
             exit(-1);
         }
     }
@@ -47,19 +47,19 @@ void EnqueueString(Queue *q, char *string) {
     q->enqueueCount++;
     // notify dequeue
     if (0 != pthread_cond_signal(&(q->q_emptying))) {
-        printf("Error occured signaling condition var\n");
+        fprintf(stderr, "Error occured signaling condition var\n");
         exit(-1);
     }
     // unlock monitor
     if (0 != pthread_mutex_unlock(&(q->mutex))) {
-        printf("Error occured unlocking mutex\n");
+        fprintf(stderr, "Error occured unlocking mutex\n");
         exit(-1);
     }
 }
 
 char * DequeueString(Queue *q) {
     if (0 != pthread_mutex_lock(&(q->mutex))) {
-        printf("Error occured locking mutex\n");
+        fprintf(stderr, "Error occured locking mutex\n");
         exit(-1);
     }
     char* ret_str;
@@ -67,7 +67,7 @@ char * DequeueString(Queue *q) {
     while (q->num_elem <= 0) {
         q->dequeueBlockCount = q->dequeueBlockCount + 1;
         if (0 != pthread_cond_wait(&(q->q_emptying),&(q->mutex))) {
-            printf("Error occured waiting\n");
+            fprintf(stderr, "Error occured waiting\n");
             exit(-1);
         }
     }
@@ -77,12 +77,12 @@ char * DequeueString(Queue *q) {
     q->dequeueCount++;
     // notify dequeue
     if (0 != pthread_cond_signal(&(q->q_filling))) {
-        printf("Error occured signaling condition var\n");
+        fprintf(stderr, "Error occured signaling condition var\n");
         exit(-1);
     }
 
     if (0 != pthread_mutex_unlock(&(q->mutex))) {
-        printf("Error occured unlocking mutex\n");
+        fprintf(stderr, "Error occured unlocking mutex\n");
         exit(-1);
     }
     return ret_str;
@@ -90,8 +90,9 @@ char * DequeueString(Queue *q) {
 
 void PrintQueueStats(Queue *q) {
     if (q == NULL) return;
-    fprintf(stderr, "enqueueCount: %d, dequeueCount: %d, "
-            "enqueueBlockCount: %d, dequeueBlockCount: %d\n",
+    // FIXME should this be stderr? where did I get that from...
+    fprintf(stderr, "\tenqueueCount: %d\n\tdequeueCount: %d\n"
+            "\tenqueueBlockCount: %d\n\tdequeueBlockCount: %d\n",
             q->enqueueCount, q->dequeueCount, 
             q->enqueueBlockCount, q->dequeueBlockCount);
 }

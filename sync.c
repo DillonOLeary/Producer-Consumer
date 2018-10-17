@@ -2,9 +2,8 @@
 
 void * run_thread(void *t) {
     while (DONE != (((P2_thread*)t)->DoAction)(t));
-    // TODO use pthread_exit and calloc to 0 out memory location
+    // TODO use calloc to 0 out memory location
     // TODO pass termination EOF through queues
-    // TODO print all error to stderr
     pthread_exit(NULL);
     return NULL;
 }
@@ -16,20 +15,21 @@ void run() {
     int i;
     for (i = 0; i < NUM_THREADS; i++) {
         if (0 != pthread_create(&(tid[i]), NULL, &run_thread, (void*) t_array[i])) {
-            printf("Error creating thread\n");
+            fprintf(stderr, "Error creating thread\n");
             exit(-1);
         }
     }
     for (i = 0; i < NUM_THREADS; i++) {
         if (0 != pthread_join(tid[i], NULL)) {
-            printf("Error joining thread\n");
+            fprintf(stderr, "Error joining thread\n");
             exit(-1);
         }
     }
-    // TODO print out statistics AFTER all threads have finished
-    //pthread_t test;
-    //PrintQueueStats(test.this_q);
-    for (i = 0; i < NUM_THREADS; i++) {
+
+    // FIXME This assumes the first thread is the reader thread, which has no queue
+    printf("\n");
+    for (i = 1; i < NUM_THREADS; i++) {
+        printf("Queue %d:\n", i);
         PrintThreadQueueStats(t_array[i]);
     }
 }
