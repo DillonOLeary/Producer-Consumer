@@ -11,7 +11,7 @@
 // When there is no work left to do for a thread
 #define DONE 0
 #define NOT_DONE 1
-const int NUM_THREADS = 4;
+#define NUM_THREADS 4
 // This struct is the information about a 
 // thread that will run
 typedef struct {
