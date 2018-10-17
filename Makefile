@@ -1,9 +1,9 @@
 CC = gcc
 WARNING_FLAGS = -Wall -Wextra
-EXE = muncher
+EXE = prodcomm
 SCAN_BUILD_DIR = scan-build-out
 
-muncher: main.o sync.o queue.o p2_thread.o
+prodcomm: main.o sync.o queue.o p2_thread.o
 	$(CC) -pthread -o $(EXE) main.o sync.o queue.o p2_thread.o
 
 main.o: main.c
@@ -35,7 +35,8 @@ scan-view: scan-build
 	firefox -new-window $(SCAN_BUILD_DIR)/*/index.html
 
 submit-d: 
-	cp *.[ch] makefile partner.txt README ~cs537-1/handin/do-leary/proj2
+	cp partner.txt README ~cs537-1/handin/do-leary/proj2
+	cp *.[ch] Makefile ~cs537-1/handin/do-leary/proj2/code
 
 submit-e:
 	cp partner.txt ~cs537-1/handin/ezra/proj2
