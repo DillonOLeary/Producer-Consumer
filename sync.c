@@ -1,8 +1,8 @@
 #include "p2_thread.h"
 
 void * run_thread(void *t) {
-    // FIXME i don't know if this is the correct way to call these functions
     while (DONE != (((P2_thread*)t)->DoAction)(t));
+    // TODO use pthread_exit and calloc to 0 out memory location
     return NULL;
 }
 
