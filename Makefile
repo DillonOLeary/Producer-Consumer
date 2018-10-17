@@ -10,10 +10,10 @@ main.o: main.c
 	$(CC) $(WARNING_FLAGS) -c main.c
 
 sync.o: sync.c  sync.h
-	$(CC) $(WARNING_FLAGS) -c sync.c  sync.h
+	$(CC) $(WARNING_FLAGS) -c sync.c
 
 queue.o: queue.c  queue.h
-	$(CC) $(WARNING_FLAGS) -c queue.c  queue.h
+	$(CC) $(WARNING_FLAGS) -c queue.c
 
 p2_thread.o: p2_thread.c  p2_thread.h
 	$(CC) $(WARNING_FLAGS) -c p2_thread.c
