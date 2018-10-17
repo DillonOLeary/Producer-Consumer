@@ -1,10 +1,9 @@
-#define NUM_THREADS 4
 #include "p2_thread.h"
 
 void * run_thread(void *t) {
     t = (P2_thread*)t;
     // FIXME i don't know if this is the correct way to call these functions
-    while (DONE != (t->DoAction)(t));
+//    while (DONE != (t->DoAction)(t));
     return NULL;
 }
 

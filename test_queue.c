@@ -2,7 +2,7 @@
 #include "queue.h"
 #include <unistd.h>
 #include <pthread.h>
-#define NUM_THREADS 30
+//#define NUM_THREADS 30
 pthread_t tid[NUM_THREADS];
 
 void * test_thread(void *q) {
