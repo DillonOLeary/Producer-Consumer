@@ -3,6 +3,7 @@
 void * run_thread(void *t) {
     while (DONE != (((P2_thread*)t)->DoAction)(t));
     // TODO use pthread_exit and calloc to 0 out memory location
+    // TODO pass termination EOF through queues
     return NULL;
 }
 
@@ -23,4 +24,5 @@ void run() {
             exit(-1);
         }
     }
+    // TODO print out statistics AFTER all threads have finished
 }
