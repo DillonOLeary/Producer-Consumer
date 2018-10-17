@@ -89,6 +89,7 @@ char * DequeueString(Queue *q) {
 }
 
 void PrintQueueStats(Queue *q) {
+    if (q == NULL) return;
     fprintf(stderr, "enqueueCount: %d, dequeueCount: %d, "
             "enqueueBlockCount: %d, dequeueBlockCount: %d\n",
             q->enqueueCount, q->dequeueCount, 

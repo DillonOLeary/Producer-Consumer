@@ -60,4 +60,10 @@ int Munch2Action(P2_thread *t);
  */
 int WriterAction(P2_thread *t);
 
+/**
+ * Prints this threads queue stats if it has
+ * a queue
+ */
+void PrintThreadQueueStats(P2_thread *t);
+
 #endif

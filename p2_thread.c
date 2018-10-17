@@ -102,3 +102,7 @@ int WriterAction(P2_thread *t) {
     }
     return NOT_DONE;
 }
+
+void PrintThreadQueueStats(P2_thread *t) {
+    PrintQueueStats(t->this_q);
+}
