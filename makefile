@@ -33,3 +33,10 @@ scan-build: clean
 #
 scan-view: scan-build
 	firefox -new-window $(SCAN_BUILD_DIR)/*/index.html
+
+submit-d: 
+	cp *.[ch] makefile partner.txt README ~cs537-1/handin/do-leary/proj2
+
+submit-e:
+	cp partner.txt ~cs537-1/handin/ezra/proj2
+
