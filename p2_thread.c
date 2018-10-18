@@ -9,7 +9,11 @@
 const int IN_BUFF_SIZE = 1024;
 
 P2_thread ** CreateThreadArray() {
-    P2_thread **threads = malloc(sizeof(P2_thread *) * NUM_THREADS);
+    P2_thread **threads = calloc(NUM_THREADS, sizeof(P2_thread *));
+    if (threads == NULL) {
+        printf("Error, failure to allocate memory");
+        exit(1);
+    }
     int i;
     
     Queue *readToMun1  = CreateStringQueue(IN_BUFF_SIZE);
@@ -17,7 +21,7 @@ P2_thread ** CreateThreadArray() {
     Queue *mun2ToWrite = CreateStringQueue(IN_BUFF_SIZE);
 
     for (i = 0; i < NUM_THREADS; i++) {
-        threads[i] = malloc(sizeof(P2_thread));
+        threads[i] = calloc(1, sizeof(P2_thread));
     }
     
     threads[0]->next_q = readToMun1;
@@ -37,17 +41,16 @@ P2_thread ** CreateThreadArray() {
 }
 
 int ReaderAction(P2_thread *t) {
-   
-    char *input = malloc(sizeof(char) * IN_BUFF_SIZE);
+    char *input = calloc(IN_BUFF_SIZE, sizeof(char));   // Create our input buffer
     int i;
-
     for (i = 0; i < IN_BUFF_SIZE; i++) {
-        input[i] = fgetc(stdin);
+        input[i] = getc(stdin); // Snag a character
+        /* Check if the new character signals that we are done with a line */
         if (input[i] == '\n' || input[i] == EOF) {
-            EnqueueString(t->next_q, input);
             if (input[i] == EOF) return DONE;
+            EnqueueString(t->next_q, input);
             else return NOT_DONE;
-        }
+        } else continue;
     }
     return NOT_DONE;   // Disregard line
 
@@ -66,7 +69,7 @@ int Munch1Action(P2_thread *t) {
         }
         if (string[i] == ' ') string[i] = '*';
     }
-    return 1;
+    return NOT_DONE;
 }
 
 int Munch2Action(P2_thread *t) {
@@ -92,13 +95,14 @@ int WriterAction(P2_thread *t) {
     int i;
     for (i = 0; i < IN_BUFF_SIZE; i++) {
         if (string[i] == '\n' || string[i] == EOF) {
-            printf("%s", string);
+            printf("\n");
             if (string[i] == EOF) return DONE;
             else {
                 free(string);
                 return NOT_DONE;
             }
-        }   
+        }
+        printf("%c", string[i]);   
     }
     return NOT_DONE;
 }
