@@ -7,6 +7,7 @@
 #define z_ASCII      122
 
 const int IN_BUFF_SIZE = 1024;
+const int QUEUE_SIZE = 10;
 
 P2_thread ** CreateThreadArray() {
     P2_thread **threads = calloc(NUM_THREADS, sizeof(P2_thread *));
@@ -16,9 +17,9 @@ P2_thread ** CreateThreadArray() {
     }
     int i;
     
-    Queue *readToMun1  = CreateStringQueue(IN_BUFF_SIZE);
-    Queue *mun1ToMun2  = CreateStringQueue(IN_BUFF_SIZE);
-    Queue *mun2ToWrite = CreateStringQueue(IN_BUFF_SIZE);
+    Queue *readToMun1  = CreateStringQueue(QUEUE_SIZE);
+    Queue *mun1ToMun2  = CreateStringQueue(QUEUE_SIZE);
+    Queue *mun2ToWrite = CreateStringQueue(QUEUE_SIZE);
 
     for (i = 0; i < NUM_THREADS; i++) {
         threads[i] = calloc(1, sizeof(P2_thread));
