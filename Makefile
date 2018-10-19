@@ -4,19 +4,19 @@ EXE = prodcomm
 SCAN_BUILD_DIR = scan-build-out
 
 prodcomm: main.o sync.o queue.o p2_thread.o
-	$(CC) -pthread -o $(EXE) main.o sync.o queue.o p2_thread.o
+	$(CC) -g -o $(EXE) main.o sync.o queue.o p2_thread.o -lpthread
 
 main.o: main.c
-	$(CC) $(WARNING_FLAGS) -c main.c
+	$(CC) $(WARNING_FLAGS) -c -g main.c
 
 sync.o: sync.c  sync.h
-	$(CC) $(WARNING_FLAGS) -c sync.c
+	$(CC) $(WARNING_FLAGS) -c -g sync.c
 
 queue.o: queue.c  queue.h
-	$(CC) $(WARNING_FLAGS) -c queue.c
+	$(CC) $(WARNING_FLAGS) -c -g queue.c
 
 p2_thread.o: p2_thread.c  p2_thread.h
-	$(CC) $(WARNING_FLAGS) -c p2_thread.c
+	$(CC) $(WARNING_FLAGS) -c -g p2_thread.c
 
 clean:
 	rm *.o $(EXE) 

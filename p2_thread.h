@@ -1,7 +1,7 @@
 #ifndef __P2__thread_H__
 #define __P2__thread_H__
 #include "queue.h"
-
+#include <stdbool.h>
 /**
  * This module contains the p2_thread struct,
  * the p2_threads_wrapper struct,
@@ -18,6 +18,8 @@ typedef struct {
     int (*DoAction)();
     Queue *this_q;
     Queue *next_q;
+    bool readerDone;
+    bool *isDone;
     // This is used by the first thread to take input
     // from stdin or another file
 } P2_thread;
