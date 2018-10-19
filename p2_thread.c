@@ -47,6 +47,8 @@ int ReaderAction(P2_thread *t) {
     for (i = 0; i < IN_BUFF_SIZE; i++) {
         input[i] = getc(stdin); // Snag a character
         /* Check if the new character signals that we are done with a line */
+        // FIXME we need to append a '\0' character at the end of buffer when read from stdin to show it is a String
+        // unless it is already null at the end
         if (input[i] == '\n' || input[i] == EOF) {
             if (input[i] == EOF) return DONE;
             EnqueueString(t->next_q, input);
