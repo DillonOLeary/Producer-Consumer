@@ -91,8 +91,9 @@ char * DequeueString(Queue *q) {
 void PrintQueueStats(Queue *q) {
     if (q == NULL) return;
     // FIXME should this be stderr? where did I get that from...
+    // one less for enqueue and dequeue because the last item is the EOF
     fprintf(stderr, "\tenqueueCount: %d\n\tdequeueCount: %d\n"
             "\tenqueueBlockCount: %d\n\tdequeueBlockCount: %d\n",
-            q->enqueueCount, q->dequeueCount, 
+            q->enqueueCount - 1, q->dequeueCount - 1, 
             q->enqueueBlockCount, q->dequeueBlockCount);
 }

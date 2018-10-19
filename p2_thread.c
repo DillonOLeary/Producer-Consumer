@@ -7,6 +7,7 @@
 #define z_ASCII      122
 
 const int IN_BUFF_SIZE = 1024;
+const int QUEUE_SIZE = 10;
 
 P2_thread ** CreateThreadArray() {
     P2_thread **threads = calloc(NUM_THREADS, sizeof(P2_thread *));
@@ -16,9 +17,9 @@ P2_thread ** CreateThreadArray() {
     }
     int i;
     
-    Queue *readToMun1  = CreateStringQueue(IN_BUFF_SIZE);
-    Queue *mun1ToMun2  = CreateStringQueue(IN_BUFF_SIZE);
-    Queue *mun2ToWrite = CreateStringQueue(IN_BUFF_SIZE);
+    Queue *readToMun1  = CreateStringQueue(QUEUE_SIZE);
+    Queue *mun1ToMun2  = CreateStringQueue(QUEUE_SIZE);
+    Queue *mun2ToWrite = CreateStringQueue(QUEUE_SIZE);
 
     for (i = 0; i < NUM_THREADS; i++) {
         threads[i] = calloc(1, sizeof(P2_thread));
@@ -43,15 +44,24 @@ P2_thread ** CreateThreadArray() {
 int ReaderAction(P2_thread *t) {
     char *input = calloc(IN_BUFF_SIZE, sizeof(char));   // Create our input buffer
     int i;
-    for (i = 0; i < IN_BUFF_SIZE; i++) {
-        input[i] = getc(stdin); // Snag a character
+    // Save room for the null terminator
+    for (i = 0; i < IN_BUFF_SIZE - 1; i++) {
         /* Check if the new character signals that we are done with a line */
-        if (input[i] == '\n' || input[i] == EOF) {
-            if (input[i] == EOF) return DONE;
+        input[i] = getc(stdin); // Snag a character
+        // FIXME we need to append a '\0' character at the end of buffer when read from stdin to show it is a String
+        // unless it is already null at the end
+        if (input[i] == '\0' || input[i] == '\n' || input[i] == EOF) {
+            if ('\0' != input[i]) {
+                input[i+1] = '\0';
+            }
             EnqueueString(t->next_q, input);
+            if (input[i] == EOF)
+                return DONE;
             else return NOT_DONE;
         } else continue;
     }
+    fprintf(stderr, "Input line too long\n"); 
+    while( '\n' != getc(stdin) );
     return NOT_DONE;   // Disregard line
 
 }
@@ -62,7 +72,7 @@ int Munch1Action(P2_thread *t) {
     char *string; 
     string = DequeueString(t->this_q);
     for (i = 0; i < IN_BUFF_SIZE; i++) {
-        if (string[i] == '\n' || string[i] == EOF) {
+        if (string[i] == '\0' || string[i] == EOF) {
             EnqueueString(t->next_q, string);
             if (string[i] == EOF) return DONE;
             else return NOT_DONE;
@@ -77,7 +87,7 @@ int Munch2Action(P2_thread *t) {
     char *string; 
     string = DequeueString(t->this_q);
     for (i = 0; i < IN_BUFF_SIZE; i++) {
-        if (string[i] == '\n' || string[i] == EOF) {
+        if (string[i] == '\0' || string[i] == EOF) {
             EnqueueString(t->next_q, string);
             if (string[i] == EOF) return DONE;
             else return NOT_DONE;
@@ -94,7 +104,7 @@ int WriterAction(P2_thread *t) {
     char *string = DequeueString(t->this_q);
     int i;
     for (i = 0; i < IN_BUFF_SIZE; i++) {
-        if (string[i] == '\n' || string[i] == EOF) {
+        if (string[i] == '\0' || string[i] == EOF) {
             printf("\n");
             if (string[i] == EOF) return DONE;
             else {
@@ -102,7 +112,7 @@ int WriterAction(P2_thread *t) {
                 return NOT_DONE;
             }
         }
-        printf("%c", string[i]);   
+        printf("%s", string);   
     }
     return NOT_DONE;
 }
