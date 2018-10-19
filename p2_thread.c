@@ -55,6 +55,9 @@ int ReaderAction(P2_thread *t) {
             else return NOT_DONE;
         } else continue;
     }
+    // FIXME this should then do some sort of flush
+    // fprintf(stderr, "Input line too long\n"); 
+    // while( '\n' != getc(stdin) );
     return NOT_DONE;   // Disregard line
 
 }
