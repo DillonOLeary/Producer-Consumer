@@ -55,7 +55,9 @@ int ReaderAction(P2_thread *t) {
         if (input[i] == '\n' || input[i] == EOF) {
             temp = input[i];
             input[i] = '\0';
+            if (i == 0
             EnqueueString(t->next_q, input);
+            
             if (temp == EOF) {
                 EnqueueString(t->next_q, END);
                 return DONE;
