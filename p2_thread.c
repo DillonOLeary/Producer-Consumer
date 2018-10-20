@@ -5,8 +5,6 @@
 #include <ctype.h>
 
 #define END          NULL
-#define a_ASCII      97
-#define z_ASCII      122
 
 const int IN_BUFF_SIZE = 1024;
 const int QUEUE_SIZE = 10;
@@ -19,10 +17,12 @@ P2_thread ** CreateThreadArray() {
     }
     int i;
     
+    // Create the queues that the threads communicate through
     Queue *readToMun1  = CreateStringQueue(QUEUE_SIZE);
     Queue *mun1ToMun2  = CreateStringQueue(QUEUE_SIZE);
     Queue *mun2ToWrite = CreateStringQueue(QUEUE_SIZE);
 
+    // Allocate memory for each of the threads
     for (i = 0; i < NUM_THREADS; i++) {
         threads[i] = calloc(1, sizeof(P2_thread));
         if (threads[i] == NULL) {
@@ -30,7 +30,8 @@ P2_thread ** CreateThreadArray() {
             exit(1);
         }
     }
-     
+    
+    /* Initalize the threads with their function and queues */
     threads[0]->next_q = readToMun1;
     threads[0]->DoAction = ReaderAction;
     
@@ -54,36 +55,33 @@ int ReaderAction(P2_thread *t) {
         fprintf(stderr, "ERROR");
         exit(-1);   // Create our input buffer
     }
-    volatile int i;
+    int i;
     char temp;
     for (i = 0; i < IN_BUFF_SIZE; i++) {
         input[i] = fgetc(stdin); // Snag a character
         /* Check if the new character signals that we are done with a line */
-        // FIXME we need to append a '\0' character at the end of buffer when read from stdin to show it is a String
         // unless it is already null at the end
         if (input[i] == '\0') fprintf(stderr, "ERROR!");
         if (input[i] == '\n' || input[i] == EOF) {
             temp = input[i];
             input[i] = '\0';
-            if (i == 0 && temp == EOF) {
+            if (i == 0 && temp == EOF) { // Dont queue an unneeded empty line
                 EnqueueString(t->next_q, END);
                 return DONE;
                 // Do nothing here
-            } else {
+            } else {    // Even if its EOF we want the chars before that
                 EnqueueString(t->next_q, input);
             }
-            if (temp == EOF) {
-                EnqueueString(t->next_q, END);
+            if (temp == EOF) {  // If we're done, tell the rest of the queues
+                EnqueueString(t->next_q, END); 
                 return DONE;
             }
             return NOT_DONE;
         }
     }
-    // FIXME this should then do some sort of flush
-    // fprintf(stderr, "Input line too long\n"); 
     
     char c = getc(stdin);
-    while( c != '\n' && c != EOF ) c = getc(stdin);
+    while( c != '\n' && c != EOF ) c = getc(stdin); // discard until we're \n
     fprintf(stderr, "LINE TOO LONG\n");
     if (c == EOF) {
         EnqueueString(t->next_q, END);
@@ -94,7 +92,7 @@ int ReaderAction(P2_thread *t) {
 }
 // This should end if reader is done
 int Munch1Action(P2_thread *t) {
-    volatile int i;
+    int i;
     char *string; 
     string = DequeueString(t->this_q);
     if (string == END) {
@@ -113,33 +111,35 @@ int Munch1Action(P2_thread *t) {
 }
 
 int Munch2Action(P2_thread *t) {
-    volatile int i;
+    int i;
     char *string; 
 
     string = DequeueString(t->this_q);
+    // If it gets the indicator that the read is done we pass it along and end
     if (string == END) {
         EnqueueString(t->next_q, string);
         return DONE;
     }
+    // Go through each char in the string and convert to upper case
     for (i = 0; i < IN_BUFF_SIZE; i++) {
         if (string[i] == '\0') {
             EnqueueString(t->next_q, string);
             return NOT_DONE;
         }
         string[i] = toupper((unsigned char) string[i]);
-        //if (string[i] >= a_ASCII && string[i] <= z_ASCII) 
-        //    string[i] = string[i] - 32;     // Convert the ascii value from an upper case value to lower case
     }
     return NOT_DONE;
 }
 
 int WriterAction(P2_thread *t) {
     char *string = DequeueString(t->this_q);
+    // Shouldn't print if we get the end indicator
     if (string == END) {
         return DONE;
     }
 
-    volatile int i;
+    int i;
+    // Print each char and then when the end is reached insert a new line
     for (i = 0; i < IN_BUFF_SIZE; i++) {
         if (string[i] == '\0') {
             printf("\n");
