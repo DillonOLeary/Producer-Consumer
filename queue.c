@@ -44,7 +44,7 @@ void EnqueueString(Queue *q, char *string) {
     // add string to queue at num_elem
     // increment num_elem
     q->head[q->num_elem++] = string;
-    q->enqueueCount++;
+    if (string[0] != EOF) q->enqueueCount++;
     // notify dequeue
     if (0 != pthread_cond_signal(&(q->q_emptying))) {
         fprintf(stderr, "Error occured signaling condition var\n");
@@ -74,7 +74,7 @@ char * DequeueString(Queue *q) {
     // add string to queue at num_elem
     // increment num_elem
     ret_str = q->head[--(q->num_elem)];
-    q->dequeueCount++;
+    if (ret_str[0] != EOF) q->dequeueCount++;
     // notify dequeue
     if (0 != pthread_cond_signal(&(q->q_filling))) {
         fprintf(stderr, "Error occured signaling condition var\n");
