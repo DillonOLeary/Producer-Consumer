@@ -44,7 +44,7 @@ P2_thread ** CreateThreadArray() {
 }
 
 int ReaderAction(P2_thread *t) {
-    char *input = malloc(IN_BUFF_SIZE * sizeof(char));   // Create our input buffer
+    char *input = calloc(IN_BUFF_SIZE, sizeof(char));   // Create our input buffer
     int i;
     char temp;
     for (i = 0; i < IN_BUFF_SIZE; i++) {
@@ -56,6 +56,8 @@ int ReaderAction(P2_thread *t) {
             temp = input[i];
             input[i] = '\0';
             if (i == 0 && temp == EOF) {
+                EnqueueString(t->next_q, END);
+                return DONE;
                 // Do nothing here
             } else {
                 EnqueueString(t->next_q, input);
@@ -118,7 +120,6 @@ int Munch2Action(P2_thread *t) {
             string[i] = string[i] - 32;     // Convert the ascii value from an upper case value to lower case
     }
     return NOT_DONE;
-
 }
 
 int WriterAction(P2_thread *t) {

@@ -73,7 +73,7 @@ char * DequeueString(Queue *q) {
     }
     // add string to queue at num_elem
     // increment num_elem
-    ret_str = q->head[(q->num_elem)--];
+    ret_str = q->head[--(q->num_elem)];
     q->dequeueCount++;
     // notify dequeue
     if (0 != pthread_cond_signal(&(q->q_filling))) {
