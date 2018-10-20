@@ -105,7 +105,7 @@ void PrintQueueStats(Queue *q) {
     if (q == NULL) return;
     // FIXME should this be stderr? where did I get that from...
     // FIXME enqueue and dequeue - 1 because the last element is the EOF char
-    fprintf(stderr, "\tenqueueCount: %d\n\tdequeueCount: %d\n"
+    fprintf(stdout, "\tenqueueCount: %d\n\tdequeueCount: %d\n"
             "\tenqueueBlockCount: %d\n\tdequeueBlockCount: %d\n",
             q->enqueueCount, q->dequeueCount, 
             q->enqueueBlockCount, q->dequeueBlockCount);
