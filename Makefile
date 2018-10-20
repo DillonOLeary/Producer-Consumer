@@ -1,6 +1,5 @@
 CC = gcc
 WARNING_FLAGS = -Wall -Wextra -g
-
 EXE = prodcomm
 SCAN_BUILD_DIR = scan-build-out
 
@@ -42,3 +41,23 @@ submit-d:
 submit-e:
 	cp partner.txt ~cs537-1/handin/ezra/proj2
 
+test1:
+	prodcomm < ~cs537-1/public/proj2/test1.txt
+
+test2:
+	prodcomm < ~cs537-1/public/proj2/test2.txt
+
+test3:
+	prodcomm < ~cs537-1/public/proj2/test3.txt
+
+ten_t:
+	prodcomm < ~cs537-1/public/proj2/ten_thousand_char_line.txt
+
+one_h:
+	prodcomm < ~cs537-1/public/proj2/one_hundred_thousand_char_line.txt
+
+one_m:
+	prodcomm < ~cs537-1/public/proj2/one_million_char_line.txt
+
+no_n:
+	prodcomm < ~cs537-1/public/proj2/no_newline.txt

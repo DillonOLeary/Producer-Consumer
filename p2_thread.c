@@ -8,7 +8,7 @@
 #define z_ASCII      122
 
 const int IN_BUFF_SIZE = 1024;
-const int QUEUE_SIZE = 10;
+const int QUEUE_SIZE = 100000;
 
 P2_thread ** CreateThreadArray() {
     P2_thread **threads = calloc(NUM_THREADS, sizeof(P2_thread *));
