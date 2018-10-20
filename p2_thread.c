@@ -48,26 +48,35 @@ int ReaderAction(P2_thread *t) {
     int i;
     char temp;
     for (i = 0; i < IN_BUFF_SIZE; i++) {
-        input[i] = getc(stdin); // Snag a character
+        input[i] = fgetc(stdin); // Snag a character
         /* Check if the new character signals that we are done with a line */
         // FIXME we need to append a '\0' character at the end of buffer when read from stdin to show it is a String
         // unless it is already null at the end
         if (input[i] == '\n' || input[i] == EOF) {
             temp = input[i];
             input[i] = '\0';
-            if (i == 0
-            EnqueueString(t->next_q, input);
-            
+            if (i == 0 && temp == EOF) {
+                // Do nothing here
+            } else {
+                EnqueueString(t->next_q, input);
+            }
             if (temp == EOF) {
                 EnqueueString(t->next_q, END);
                 return DONE;
             }
             return NOT_DONE;
-        } else continue;
+        }
     }
     // FIXME this should then do some sort of flush
     // fprintf(stderr, "Input line too long\n"); 
-    // while( '\n' != getc(stdin) );
+    
+    char c = getc(stdin);
+    while( c != '\n' && c != EOF ) c = getc(stdin);
+    fprintf(stderr, "LINE TOO LONG\n");
+    if (c == EOF) {
+        EnqueueString(t->next_q, END);
+        return DONE;
+    }
     return NOT_DONE;   // Disregard line
 
 }
