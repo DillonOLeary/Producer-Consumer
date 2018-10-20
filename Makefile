@@ -1,5 +1,6 @@
 CC = gcc
-WARNING_FLAGS = -Wall -Wextra
+WARNING_FLAGS = -Wall -Wextra -g
+
 EXE = prodcomm
 SCAN_BUILD_DIR = scan-build-out
 
