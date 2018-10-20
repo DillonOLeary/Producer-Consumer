@@ -2,8 +2,6 @@
 
 void * run_thread(void *t) {
     while (DONE != (((P2_thread*)t)->DoAction)(t));
-    // TODO use calloc to 0 out memory location
-    // TODO pass termination EOF through queues
     pthread_exit(NULL);
     return NULL;
 }
@@ -26,7 +24,6 @@ void run() {
         }
     }
 
-    // FIXME This assumes the first thread is the reader thread, which has no queue
     printf("\n");
     for (i = 1; i < NUM_THREADS; i++) {
         printf("Queue %d:\n", i);
