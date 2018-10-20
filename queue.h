@@ -1,6 +1,6 @@
 #ifndef __queue_h__
 #define __queue_h__
-
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -14,14 +14,16 @@
 typedef struct {
     char ** head;
     int queue_size;
-    int num_elem;
+    volatile int num_elem;
     pthread_mutex_t mutex;
     pthread_cond_t q_filling;
     pthread_cond_t q_emptying;
-    int enqueueCount;
-    int dequeueCount;
-    int enqueueBlockCount;
-    int dequeueBlockCount;
+    volatile int enqueueCount;
+    volatile int dequeueCount;
+    volatile int enqueueBlockCount;
+    volatile int dequeueBlockCount;
+    volatile int front;
+    volatile int rear;
 } Queue;
 
 /**

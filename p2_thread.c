@@ -2,6 +2,7 @@
 #include "queue.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #define END          NULL
 #define a_ASCII      97
@@ -24,8 +25,12 @@ P2_thread ** CreateThreadArray() {
 
     for (i = 0; i < NUM_THREADS; i++) {
         threads[i] = calloc(1, sizeof(P2_thread));
+        if (threads[i] == NULL) {
+            fprintf(stderr, "Error, failure to allocate memory");
+            exit(1);
+        }
     }
-    
+     
     threads[0]->next_q = readToMun1;
     threads[0]->DoAction = ReaderAction;
     
@@ -44,14 +49,19 @@ P2_thread ** CreateThreadArray() {
 }
 
 int ReaderAction(P2_thread *t) {
-    char *input = calloc(IN_BUFF_SIZE, sizeof(char));   // Create our input buffer
-    int i;
+    char *input;
+    if (NULL == (input = calloc(IN_BUFF_SIZE, sizeof(char)))){
+        fprintf(stderr, "ERROR");
+        exit(-1);   // Create our input buffer
+    }
+    volatile int i;
     char temp;
     for (i = 0; i < IN_BUFF_SIZE; i++) {
         input[i] = fgetc(stdin); // Snag a character
         /* Check if the new character signals that we are done with a line */
         // FIXME we need to append a '\0' character at the end of buffer when read from stdin to show it is a String
         // unless it is already null at the end
+        if (input[i] == '\0') fprintf(stderr, "ERROR!");
         if (input[i] == '\n' || input[i] == EOF) {
             temp = input[i];
             input[i] = '\0';
@@ -84,7 +94,7 @@ int ReaderAction(P2_thread *t) {
 }
 // This should end if reader is done
 int Munch1Action(P2_thread *t) {
-    int i;
+    volatile int i;
     char *string; 
     string = DequeueString(t->this_q);
     if (string == END) {
@@ -103,7 +113,7 @@ int Munch1Action(P2_thread *t) {
 }
 
 int Munch2Action(P2_thread *t) {
-    int i;
+    volatile int i;
     char *string; 
 
     string = DequeueString(t->this_q);
@@ -116,8 +126,9 @@ int Munch2Action(P2_thread *t) {
             EnqueueString(t->next_q, string);
             return NOT_DONE;
         }
-        if (string[i] >= a_ASCII && string[i] <= z_ASCII) 
-            string[i] = string[i] - 32;     // Convert the ascii value from an upper case value to lower case
+        string[i] = toupper((unsigned char) string[i]);
+        //if (string[i] >= a_ASCII && string[i] <= z_ASCII) 
+        //    string[i] = string[i] - 32;     // Convert the ascii value from an upper case value to lower case
     }
     return NOT_DONE;
 }
@@ -125,19 +136,19 @@ int Munch2Action(P2_thread *t) {
 int WriterAction(P2_thread *t) {
     char *string = DequeueString(t->this_q);
     if (string == END) {
-        free(string);
         return DONE;
     }
 
-    int i;
+    volatile int i;
     for (i = 0; i < IN_BUFF_SIZE; i++) {
         if (string[i] == '\0') {
             printf("\n");
-            free(string);
+            if (string != NULL) free(string);
             return NOT_DONE;
         }
         printf("%c", string[i]);   
     }
+    free(string);
     return NOT_DONE;
 }
 

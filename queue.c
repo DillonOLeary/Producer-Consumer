@@ -1,15 +1,17 @@
 #include "queue.h"
 #include <stdlib.h>
 #include <pthread.h>
+#include <stdbool.h>
 #include <sys/types.h>
 #include <stdio.h>
 
 Queue *CreateStringQueue(int size) {
     Queue *q;
-    q = malloc(sizeof(Queue));
+    q = calloc(1, sizeof(Queue));
     q->queue_size = size;
     q->num_elem = 0;
-    q->head = malloc(q->queue_size * sizeof(char*));
+    q->front = q->rear = 0;
+    q->head = calloc(q->queue_size, sizeof(char*));
     if (0 != pthread_mutex_init(&(q->mutex), NULL) ) {
         fprintf(stderr, "Error initializing mutex\n");
         exit(-1);
@@ -27,6 +29,7 @@ Queue *CreateStringQueue(int size) {
     return q;
 }
 
+
 void EnqueueString(Queue *q, char *string) {
     // lock with monitor
     if (0 != pthread_mutex_lock(&(q->mutex))) {
@@ -34,7 +37,7 @@ void EnqueueString(Queue *q, char *string) {
         exit(-1);
     }
     // while the queue is full then increment blocked count and  wait
-    while (q->num_elem >= q->queue_size) {
+    while (((q->rear == q->queue_size - 1) && q->front == 0) || q->rear == q->front - 1) {
         q->enqueueBlockCount = q->enqueueBlockCount + 1;
         if (0 != pthread_cond_wait(&(q->q_filling),&(q->mutex))) {
             fprintf(stderr, "Error occured waiting\n");
@@ -43,10 +46,13 @@ void EnqueueString(Queue *q, char *string) {
     }
     // add string to queue at num_elem
     // increment num_elem
-    q->head[q->num_elem++] = string;
+    //q->head[q->num_elem++] = string;
+    q->head[q->rear] = string;
+    q->rear = q->rear + 1 == q->queue_size ? 0 : q->rear + 1;
+    q->num_elem = q->num_elem + 1;
     if (string != NULL) q->enqueueCount++;
     // notify dequeue
-    if (0 != pthread_cond_signal(&(q->q_emptying))) {
+    if (0 != pthread_cond_broadcast(&(q->q_emptying))) {
         fprintf(stderr, "Error occured signaling condition var\n");
         exit(-1);
     }
@@ -55,8 +61,8 @@ void EnqueueString(Queue *q, char *string) {
         fprintf(stderr, "Error occured unlocking mutex\n");
         exit(-1);
     }
+    
 }
-
 char * DequeueString(Queue *q) {
     if (0 != pthread_mutex_lock(&(q->mutex))) {
         fprintf(stderr, "Error occured locking mutex\n");
@@ -64,7 +70,7 @@ char * DequeueString(Queue *q) {
     }
     char* ret_str;
     // while the queue is full then increment blocked count and  wait
-    while (q->num_elem <= 0) {
+    while (q->front == q->rear) {
         q->dequeueBlockCount = q->dequeueBlockCount + 1;
         if (0 != pthread_cond_wait(&(q->q_emptying),&(q->mutex))) {
             fprintf(stderr, "Error occured waiting\n");
@@ -73,10 +79,16 @@ char * DequeueString(Queue *q) {
     }
     // add string to queue at num_elem
     // increment num_elem
-    ret_str = q->head[--(q->num_elem)];
+    //q->num_elem = q->num_elem - 1;
+    //ret_str = q->head[q->num_elem];
+    ret_str = q->head[q->front];
+    q->front = (q->front + 1 == q->queue_size) ? 0 : q->front + 1;
+    //if (q->front == q->rear) q->front = q->rear = -1;
+    q->num_elem = q->num_elem - 1;
+    
     if (ret_str != NULL) q->dequeueCount++;
     // notify dequeue
-    if (0 != pthread_cond_signal(&(q->q_filling))) {
+    if (0 != pthread_cond_broadcast(&(q->q_filling))) {
         fprintf(stderr, "Error occured signaling condition var\n");
         exit(-1);
     }
@@ -85,6 +97,7 @@ char * DequeueString(Queue *q) {
         fprintf(stderr, "Error occured unlocking mutex\n");
         exit(-1);
     }
+    
     return ret_str;
 }
 
